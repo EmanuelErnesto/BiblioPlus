@@ -1,0 +1,30 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /api/v1
+
+spring:
+  application:
+    name: BiblioPlus
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_POSTGRES_USER}
+    password: ${DB_POSTGRES_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+springdoc:
+  swagger-ui-path: /biblioplus.html
+  api-docs:
+    path: /biblioplus
+  packagesToScan: com.emanuel.BiblioPlus.modules
+
+api:
+  security:
+    token:
+      secret: ${API_SECRET}
+      access-token:
+        expiration-hour: 1
+      refresh-token:
+        expiration-hour: 12
