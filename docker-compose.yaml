@@ -1,0 +1,43 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: unless-stopped
+    ports:
+      - ${WEBSERVER_DB_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DB_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DB_POSTGRES_NAME}
+    volumes:
+        - .docker/postgresql/data:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    depends_on:
+      - postgres
+    volumes:
+      - .docker/pgadmin/data:/var/lib/pgadmin
+
+#  api:
+#    container_name: biblioplus-api
+#    build: .
+#    restart: unless-stopped
+#    ports:
+#      - "8082:8082"
+#    environment:
+#      DB_POSTGRES_USER: ${DB_POSTGRES_USER}
+#      DB_POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD}
+#      DB_URL: ${DB_URL}
+#      API_SECRET: ${API_SECRET}
+#    depends_on:
+#      - postgres
+#    volumes:
+#      - .docker/api/data:/app
