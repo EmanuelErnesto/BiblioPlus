@@ -4,7 +4,9 @@ package com.emanuel.BiblioPlus.modules.users.domain.mappers;
 import com.emanuel.BiblioPlus.modules.users.domain.dtos.request.AddressDTO;
 import com.emanuel.BiblioPlus.modules.users.domain.dtos.request.CreateUserDTO;
 import com.emanuel.BiblioPlus.modules.users.domain.dtos.request.UpdateUserDTO;
+import com.emanuel.BiblioPlus.modules.users.domain.dtos.response.PaginatedUsersResponseDTO;
 import com.emanuel.BiblioPlus.modules.users.domain.dtos.response.UserResponseDTO;
+import com.emanuel.BiblioPlus.modules.users.infra.database.entities.AddressModel;
 import com.emanuel.BiblioPlus.modules.users.infra.database.entities.UserModel;
 import com.emanuel.BiblioPlus.modules.users.infra.database.entities.UserRole;
 import org.springframework.data.domain.Page;
@@ -16,12 +18,14 @@ import java.util.Map;
 
 public class UserMapper {
 
-    public static void mappingAddressDTOToUserAddressProperties(AddressDTO addressDTO, UserModel user) {
-        user.setPatio(isNullOrEmpty(addressDTO.getLogradouro()) ? "N/A" : addressDTO.getLogradouro());
-        user.setComplement(isNullOrEmpty(addressDTO.getComplemento()) ? "N/A" : addressDTO.getComplemento());
-        user.setNeighborhood(isNullOrEmpty(addressDTO.getBairro()) ? "N/A" : addressDTO.getBairro());
-        user.setLocality(isNullOrEmpty(addressDTO.getEstado()) ? "N/A" : addressDTO.getEstado());
-        user.setUf(isNullOrEmpty(addressDTO.getUf()) ? "N/A" : addressDTO.getUf());
+    public static AddressModel mappingAddressDTOToAddressModel(AddressDTO addressDTO) {
+       return AddressModel.builder()
+                .patio(isNullOrEmpty(addressDTO.getLogradouro()) ? "N/A" : addressDTO.getLogradouro())
+                .complement(isNullOrEmpty(addressDTO.getComplemento()) ? "N/A" : addressDTO.getComplemento())
+                .neighborhood(isNullOrEmpty(addressDTO.getBairro()) ? "N/A" : addressDTO.getBairro())
+                .locality(isNullOrEmpty(addressDTO.getEstado()) ? "N/A" : addressDTO.getEstado())
+                .uf(isNullOrEmpty(addressDTO.getUf()) ? "N/A" : addressDTO.getUf())
+                .build();
     }
 
     private static boolean isNullOrEmpty(String value) {
@@ -35,39 +39,42 @@ public class UserMapper {
         user.setCpf(userDTO.getCpf());
         user.setPassword(userDTO.getPassword());
         user.setBirthDay(LocalDate.parse(userDTO.getBirthDay(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        user.setCep(userDTO.getCep());
         user.setRole(UserRole.CLIENT);
         return user;
     }
 
-    public static UserResponseDTO mappingUserEntityToUserResponseDTO(UserModel userCreated) {
-        var userResponseDTO = new UserResponseDTO();
-        userResponseDTO.setId(userCreated.getId());
-        userResponseDTO.setName(userCreated.getName());
-        userResponseDTO.setEmail(userCreated.getEmail());
-        userResponseDTO.setCpf(userCreated.getCpf());
-        userResponseDTO.setBirthDay(userCreated.getBirthDay());
-        userResponseDTO.setCep(userCreated.getCep());
-        userResponseDTO.setRole(userCreated.getRole().name());
-        userResponseDTO.setPatio(userCreated.getPatio());
-        userResponseDTO.setComplement(userCreated.getComplement());
-        userResponseDTO.setNeighborhood(userCreated.getNeighborhood());
-        userResponseDTO.setLocality(userCreated.getLocality());
-        userResponseDTO.setUf(userCreated.getUf());
-        return userResponseDTO;
-    }
 
-    public static Map<String, Object> mappingPaginatedUsersToUserResponseDTO(Page<UserModel> paginatedUsers) {
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("users", paginatedUsers.
-                getContent().
-                stream().
-                map(UserMapper::mappingUserEntityToUserResponseDTO));
-        response.put("current-page", paginatedUsers.getTotalPages());
-        response.put("total-items", paginatedUsers.getNumber());
-        response.put("total-pages", paginatedUsers.getTotalPages());
+        public static UserResponseDTO mappingUserEntityToUserResponseDTO(UserModel userCreated) {
+            var userResponseDTO = new UserResponseDTO();
+            userResponseDTO.setId(userCreated.getId());
+            userResponseDTO.setName(userCreated.getName());
+            userResponseDTO.setEmail(userCreated.getEmail());
+            userResponseDTO.setCpf(userCreated.getCpf());
+            userResponseDTO.setBirthDay(userCreated.getBirthDay());
+            userResponseDTO.setRole(userCreated.getRole().name());
+            AddressModel address = userCreated.getAddress();
+            userResponseDTO.setCep(address.getCep());
+            userResponseDTO.setPatio(address.getPatio());
+            userResponseDTO.setComplement(address.getComplement());
+            userResponseDTO.setNeighborhood(address.getNeighborhood());
+            userResponseDTO.setLocality(address.getLocality());
+            userResponseDTO.setUf(address.getUf());
+            return userResponseDTO;
+        }
 
-        return response;
+
+    public static PaginatedUsersResponseDTO mappingPaginatedUsersToUserResponseDTO(Page<UserModel> paginatedUsers) {
+        return PaginatedUsersResponseDTO
+                .builder()
+                .users(paginatedUsers
+                        .getContent()
+                        .stream()
+                        .map(UserMapper::mappingUserEntityToUserResponseDTO)
+                        .toList())
+                .current_page(paginatedUsers.getNumber())
+                .total_items(paginatedUsers.getTotalElements())
+                .total_pages(paginatedUsers.getTotalPages())
+                .build();
     }
 
     public static void mappingDataFromUpdateUserToUserEntity(UpdateUserDTO userDTO, UserModel user) {
@@ -75,6 +82,5 @@ public class UserMapper {
         user.setEmail(userDTO.getEmail());
         user.setCpf(userDTO.getCpf());
         user.setBirthDay(LocalDate.parse(userDTO.getBirthDay(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        user.setCep(userDTO.getCep());
     }
 }
