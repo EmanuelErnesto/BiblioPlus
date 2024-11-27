@@ -18,7 +18,4 @@
 
         @Query("SELECT u from UserModel u WHERE u.email = :email")
         Optional<UserModel> findUserByEmail(String email);
-
-        @Query(value = "SELECT u from UserModel u")
-        Page<UserModel> findAllWithPagination(Pageable pageable);
     }

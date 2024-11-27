@@ -6,8 +6,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableFeignClients
 @EnableScheduling
+@EnableFeignClients
 public class BiblioPlusApplication {
 
 	public static void main(String[] args) {

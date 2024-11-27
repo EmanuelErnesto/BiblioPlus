@@ -3,13 +3,13 @@ package com.emanuel.BiblioPlus.modules.users.infra.controllers;
 import com.emanuel.BiblioPlus.modules.users.domain.dtos.request.CreateUserDTO;
 import com.emanuel.BiblioPlus.modules.users.domain.dtos.request.UpdateUserDTO;
 import com.emanuel.BiblioPlus.modules.users.domain.dtos.request.UpdateUserPasswordDTO;
+import com.emanuel.BiblioPlus.modules.users.domain.dtos.response.PaginatedUsersResponseDTO;
 import com.emanuel.BiblioPlus.modules.users.domain.dtos.response.UserResponseDTO;
 import com.emanuel.BiblioPlus.modules.users.domain.mappers.UserMapper;
 import com.emanuel.BiblioPlus.modules.users.infra.database.entities.UserModel;
 import com.emanuel.BiblioPlus.modules.users.services.UserServiceImpl;
 import com.emanuel.BiblioPlus.shared.exceptions.ApplicationException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,16 +17,17 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @Tag(name = "users", description = "this endpoint can create, read, update and delete a user")
 @RestController
@@ -62,16 +63,18 @@ public class UserController {
             security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Users returned successfully",
-                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDTO.class)))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PaginatedUsersResponseDTO.class))),
                     @ApiResponse(responseCode = "403", description = "you must provide a token to access this resource",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))),
+                    @ApiResponse(responseCode = "403", description = "you must be a admin to access this resource",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))),
                     @ApiResponse(responseCode = "401", description = "you must provide a valid access token to access this resource. Refresh token don't be accepted",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApplicationException.class)))
             })
     @GetMapping
-    public ResponseEntity<Map<String, Object>> list(
-            @RequestParam(defaultValue = "0") final Integer pageNumber,
-            @RequestParam(defaultValue = "5") final Integer size) {
+    public ResponseEntity<PaginatedUsersResponseDTO> list(
+            @RequestParam(defaultValue = "0") @PositiveOrZero final Integer pageNumber,
+            @RequestParam(defaultValue = "5") @PositiveOrZero final Integer size)  {
 
         Page<UserModel> users = userService.list(pageNumber, size);
 
@@ -100,6 +103,33 @@ public class UserController {
             String id){
 
         UserModel user = userService.show(id);
+
+        return ResponseEntity.ok(UserMapper.mappingUserEntityToUserResponseDTO(user));
+    }
+
+
+    @Operation(summary = "Show a existent user by cpf", description = "Resource that return a existent user with this cpf",
+            security = @SecurityRequirement(name = "security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User returned successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApplicationException.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid id",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApplicationException.class))
+                    ),
+                    @ApiResponse(responseCode = "403", description = "you must provide a token to access this resource",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))),
+                    @ApiResponse(responseCode = "401", description = "you must provide a valid access token to access this resource. Refresh token don't be accepted",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApplicationException.class)))
+            })
+    @GetMapping("/search")
+    public ResponseEntity<UserResponseDTO> getUserByCpf(
+            @RequestParam
+            @Pattern(regexp = "^\\d{11}$", message = "invalid cpf format. Try again with another value in format of 11 numbers")
+            String cpf
+    ) {
+        UserModel user = userService.getUserByCpf(cpf);
 
         return ResponseEntity.ok(UserMapper.mappingUserEntityToUserResponseDTO(user));
     }
@@ -182,7 +212,7 @@ public class UserController {
             @PathVariable("id")
             @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$")
             String id,
-            @Valid @RequestBody UpdateUserPasswordDTO body){
+            @RequestBody  @Valid UpdateUserPasswordDTO body){
         userService.updatePassword(id, body.getOldPassword(), body.getNewPassword(), body.getPasswordConfirmation());
 
         return ResponseEntity.noContent().build();

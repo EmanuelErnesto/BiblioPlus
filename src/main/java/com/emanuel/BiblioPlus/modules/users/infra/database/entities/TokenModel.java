@@ -11,7 +11,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "tb_tokens")
+@Table(name = "tb_tokens",
+indexes = @Index(name = "index_token", columnList = "token"))
 public class TokenModel {
 
     @Id
@@ -22,7 +23,7 @@ public class TokenModel {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserModel user;
 
-    @Column(name = "token", nullable = false)
+    @Column(name = "token", nullable = false, unique = true)
     private String token;
 
     @Column(name = "expires_at", nullable = false)

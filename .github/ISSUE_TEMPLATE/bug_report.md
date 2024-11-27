@@ -24,7 +24,7 @@ Steps to reproduce the issue:
 3. Observe the error message/response code
 
 ## Expected behavior
-A clear and concise description of what you expected to happen. For example, "The POST /books endpoint should return a 201 Created status and the created book in the response body."
+A clear and concise description of what you expected to happen. For example, "The POST /books endpoint should return a 201 Created status and the created bookModel in the response body."
 
 ## API Request Details
 

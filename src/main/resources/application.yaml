@@ -13,6 +13,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 springdoc:
   swagger-ui-path: /biblioplus.html
@@ -28,3 +31,6 @@ api:
         expiration-hour: 1
       refresh-token:
         expiration-hour: 12
+
+biblioplus:
+  url: ${API_URL:http://localhost:8082}

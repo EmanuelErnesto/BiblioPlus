@@ -8,10 +8,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TokenRepository extends JpaRepository<TokenModel, UUID> {
-
     Optional<TokenModel> findByTokenAndUser(String token, UserModel user);
-
-    Optional<TokenModel> findTopByUser_IdAndRevokedFalseOrderByCreatedAtDesc(UUID userId);
-
-    void deleteByTokenAndUser(String token, UserModel user);
 }
