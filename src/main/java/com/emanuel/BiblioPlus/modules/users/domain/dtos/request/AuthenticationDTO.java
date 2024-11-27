@@ -13,7 +13,7 @@ import lombok.*;
 public class AuthenticationDTO {
 
     @NotBlank
-    @Pattern(regexp = "^[a-z0-9.+-]+@[a-z0-9.+-]+\\.[a-z]{2,}$", message = "invalid email format. Try again with a valid email in format user@example.com")
+    @Pattern(regexp = "^[\\w\\d.+\\-@ãáâàäéèêëíìîïóòôöúùûüç]+@[\\w\\d.-]+\\.[a-zA-Z]{2,}$", message = "invalid email format. Try again with a valid email in format user@example.com")
     private String email;
 
     @NotBlank
