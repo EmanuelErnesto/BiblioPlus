@@ -52,8 +52,8 @@ public class AuthenticationController {
 
         var tokens = TokenResponseDTO
                 .builder()
-                .accessToken(tokenService.generateToken((UserModel)authenticate.getPrincipal(), 1))
-                .refreshToken(tokenService.generateRefreshToken((UserModel)authenticate.getPrincipal(), 12))
+                .accessToken(tokenService.generateToken((UserModel)authenticate.getPrincipal(), 1, ((UserModel) authenticate.getPrincipal()).getRole().getRole()))
+                .refreshToken(tokenService.generateRefreshToken((UserModel)authenticate.getPrincipal(), 12, ((UserModel) authenticate.getPrincipal()).getRole().getRole()))
                 .build();
 
         return ResponseEntity.ok(tokens);

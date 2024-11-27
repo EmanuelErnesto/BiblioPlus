@@ -23,6 +23,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -55,13 +57,14 @@ public class TokenService {
         this.secret = dotenv.get("API_SECRET");
     }
 
-    public String generateToken(UserModel user, Integer expiration) {
+    public String generateToken(UserModel user, Integer expiration, String role) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("BiblioPlus-App")
                     .withSubject(user.getEmail())
                     .withClaim("type", "access")
+                    .withClaim("role", role)
                     .withExpiresAt(getExpirationInst(expiration))
                     .sign(algorithm);
         }
@@ -70,13 +73,14 @@ public class TokenService {
         }
     }
 
-    public String generateRefreshToken(UserModel user, Integer expiration) {
+    public String generateRefreshToken(UserModel user, Integer expiration, String role) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
                     .withIssuer("BiblioPlus-App")
                     .withSubject(user.getEmail())
                     .withClaim("type", "refresh")
+                    .withClaim("role", role)
                     .withExpiresAt(getExpirationInst(expiration))
                     .sign(algorithm);
 
@@ -157,8 +161,8 @@ public class TokenService {
         invalidateRefreshToken(refreshToken.getRefreshToken(), (UserModel)authenticate.getPrincipal());
 
 
-        String newAccessToken = generateToken((UserModel) authenticate.getPrincipal(), expirationHour);
-        String newRefreshToken = generateRefreshToken((UserModel) authenticate.getPrincipal(), refreshTokenExpiration);
+        String newAccessToken = generateToken((UserModel) authenticate.getPrincipal(), expirationHour, ((UserModel) authenticate.getPrincipal()).getRole().getRole());
+        String newRefreshToken = generateRefreshToken((UserModel) authenticate.getPrincipal(), refreshTokenExpiration, ((UserModel) authenticate.getPrincipal()).getRole().getRole());
 
         saveRefreshToken((UserModel) authenticate.getPrincipal(), newRefreshToken);
 
@@ -170,12 +174,14 @@ public class TokenService {
 
     }
 
+    @Transactional
     private void invalidateRefreshToken(String refreshToken, UserModel user) {
         Optional<TokenModel> existingToken = tokenRepository.findByTokenAndUser(refreshToken, user);
 
         if (existingToken.isEmpty()) throw new HttpNotFoundException(AuthenticationExceptionConsts.REFRESH_TOKEN_NOT_FOUND);
 
         TokenModel token = existingToken.get();
+
         validateIfTokenIsAlreadyRevoked(token);
 
         token.setRevoked(true);
@@ -186,7 +192,18 @@ public class TokenService {
         if(token.isRevoked()) throw new HttpUnauthorizedException(AuthenticationExceptionConsts.REFRESH_TOKEN_REVOKED);
     }
 
+    @Transactional
     private void saveRefreshToken(UserModel user, String newRefreshToken) {
+        Optional<TokenModel> existingToken = tokenRepository.findByTokenAndUser(newRefreshToken, user);
+        if (existingToken.isPresent()) {
+            TokenModel token = existingToken.get();
+            if (!token.isRevoked()) {
+                token.setRevoked(true);
+                tokenRepository.save(token);
+                return;
+            }
+            return;
+        }
         TokenModel newToken = new TokenModel();
         newToken.setUser(user);
         newToken.setToken(newRefreshToken);
