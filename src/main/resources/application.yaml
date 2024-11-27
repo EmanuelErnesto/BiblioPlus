@@ -26,7 +26,7 @@ springdoc:
 api:
   security:
     token:
-      secret: ${API_SECRET}
+      secret: ${API_SECRET:0f0d41788a7922e183c1695473fe256d}
       access-token:
         expiration-hour: 1
       refresh-token:
