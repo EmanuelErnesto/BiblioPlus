@@ -26,18 +26,17 @@ services:
     volumes:
       - .docker/pgadmin/data:/var/lib/pgadmin
 
-#  api:
-#    container_name: biblioplus-api
-#    build: .
-#    restart: unless-stopped
-#    ports:
-#      - "8082:8082"
-#    environment:
-#      DB_POSTGRES_USER: ${DB_POSTGRES_USER}
-#      DB_POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD}
-#      DB_URL: ${DB_URL}
-#      API_SECRET: ${API_SECRET}
-#    depends_on:
-#      - postgres
-#    volumes:
-#      - .docker/api/data:/app
+  sonarqube:
+    container_name: sonarqube
+    image: sonarqube:latest
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: true
+
+    ports:
+      - "9000:9000"
+    depends_on:
+      - postgres
+    volumes:
+      - .docker/sonarqube/data:/opt/sonarqube/data
+      - .docker/sonarqube/extensions:/opt/sonarqube/extensions
+      - .docker/sonarqube/logs:/opt/sonarqube/logs
