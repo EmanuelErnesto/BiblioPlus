@@ -1,5 +1,6 @@
 package com.emanuel.BiblioPlus.modules.users.infra.database.entities;
 
+import com.emanuel.BiblioPlus.modules.orders.infra.database.entities.OrderModel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,10 @@ import java.util.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "tb_users")
+@Table(name = "tb_users", indexes = {
+        @Index(name = "email_index", columnList = "email"),
+        @Index(name = "cpf_index", columnList = "cpf")
+})
 public class UserModel implements UserDetails {
 
 
@@ -49,7 +53,14 @@ public class UserModel implements UserDetails {
     private String email;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TokenModel> tokens = new HashSet<>();
+    private List<TokenModel> tokens;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderModel> orders;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id", nullable = false)
+    private AddressModel address;
 
     @Column(name = "cpf", nullable = false, unique = true)
     private String cpf;
@@ -62,24 +73,6 @@ public class UserModel implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
-
-    @Column(name = "cep", nullable = false)
-    private String cep;
-
-    @Column(name = "patio")
-    private String patio;
-
-    @Column(name = "complement")
-    private String complement;
-
-    @Column(name = "neighborhood")
-    private String neighborhood;
-
-    @Column(name = "locality")
-    private String locality;
-
-    @Column(name = "uf")
-    private String uf;
 
     @CreationTimestamp
     @Column(name = "created_at")
