@@ -1,12 +1,11 @@
 package com.emanuel.BiblioPlus.modules.users.domain.dtos.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -17,7 +16,8 @@ public class CreateUserDTO {
     private String name;
 
     @NotBlank
-    @Pattern(regexp = "^[a-z0-9.+-]+@[a-z0-9.+-]+\\.[a-z]{2,}$", message = "invalid email format. Try again with a valid email in format user@example.com")
+    @NotNull
+    @Email
     private String email;
 
     @NotBlank
