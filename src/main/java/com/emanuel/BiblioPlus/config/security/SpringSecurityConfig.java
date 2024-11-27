@@ -13,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @EnableWebSecurity
 @Configuration
 public class SpringSecurityConfig {
@@ -37,6 +39,11 @@ public class SpringSecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/auth/refresh-token").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/orders/**").hasRole("ADMIN")
+                                .requestMatchers( "/books/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/books").authenticated()
+                                .requestMatchers(HttpMethod.GET,"/ping").permitAll()
                                 .requestMatchers(DOCUMENTATION_OPENAPI).permitAll()
                                 .anyRequest().authenticated()
                         )
