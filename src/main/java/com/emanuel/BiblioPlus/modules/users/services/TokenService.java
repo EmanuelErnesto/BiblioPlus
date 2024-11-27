@@ -37,6 +37,7 @@ public class TokenService {
 
     private final Dotenv dotenv;
 
+    @Value("${api.security.token.secret}")
     private final String secret;
 
     @Value("${api.security.token.access-token.expiration-hour}")
@@ -54,7 +55,6 @@ public class TokenService {
         this.dotenv = dotenv;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
-        this.secret = dotenv.get("API_SECRET");
     }
 
     public String generateToken(UserModel user, Integer expiration, String role) {
