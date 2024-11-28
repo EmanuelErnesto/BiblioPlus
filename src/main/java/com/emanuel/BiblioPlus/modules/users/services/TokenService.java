@@ -15,7 +15,6 @@ import com.emanuel.BiblioPlus.modules.users.infra.database.repositories.UserRepo
 import com.emanuel.BiblioPlus.shared.consts.AuthenticationExceptionConsts;
 import com.emanuel.BiblioPlus.shared.exceptions.HttpNotFoundException;
 import com.emanuel.BiblioPlus.shared.exceptions.HttpUnauthorizedException;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,11 +33,9 @@ import java.util.Optional;
 public class TokenService {
 
     private final Logger logger = LoggerFactory.getLogger(TokenService.class);
-
-    private final Dotenv dotenv;
-
+    
     @Value("${api.security.token.secret}")
-    private final String secret;
+    private String secret;
 
     @Value("${api.security.token.access-token.expiration-hour}")
     private int expirationHour;
@@ -51,8 +48,7 @@ public class TokenService {
     private final TokenRepository tokenRepository;
 
 
-    public TokenService(Dotenv dotenv, UserRepository userRepository, TokenRepository tokenRepository){
-        this.dotenv = dotenv;
+    public TokenService(UserRepository userRepository, TokenRepository tokenRepository){
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
     }
