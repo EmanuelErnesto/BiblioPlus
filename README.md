@@ -1,6 +1,6 @@
-<h1 align="center">Atividade Backend Framework</h1>
+<h1 align="center">BiblioPlus</h1>
 
-Este projeto consiste em uma API desenvolvida como requisito para pontuação na disciplina de backend framework
+Este projeto consiste em uma API desenvolvida como requisito para pontuação na disciplina de backend framework. A API é proposta como sendo para uma biblioteca, possuindo como entidades principais a entidade de livros(books), usuários(users) e pedidos (orders), cada uma com suas respectivas regras de negócio e validações.
 
 # Participantes
 
@@ -28,13 +28,13 @@ Antes de começar, verifique se sua máquina possui os seguintes requisitos:
 1. **Clone o repositório**:
 
    ```bash
-   git clone https://github.com/EmanuelErnesto/atividade-backend-framework.git
+   git clone https://github.com/EmanuelErnesto/BiblioPlus.git
 
 
 2. **Navegue Até a pasta do projeto**
 
   ```bash
-  cd atividade-backend-framework
+  cd BiblioPlus
 
   ```
 
@@ -46,6 +46,7 @@ Antes de começar, verifique se sua máquina possui os seguintes requisitos:
   cp .env.example .env
   ```
 
+⚠️ Preencha as variáveis de ambiente com os respectivos valores.
 
 ⚠️ Certifique-se que a porta `8082` esteja livre para o correto funcionamento da API.
 
