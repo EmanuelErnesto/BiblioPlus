@@ -19,7 +19,7 @@ Antes de começar, verifique se sua máquina possui os seguintes requisitos:
 
 - **Jdk**: versão 17 ou superior. Se você ainda possui a JDK instalada, siga o tutorial de instalação [aqui](https://techexpert.tips/pt-br/windows-pt-br/instalar-java-jdk-no-windows/).
 
-- **Docker**: necessário para executar tanto o MySQL quanto o Redis localmente. Instruções de instalação estão disponíveis [aqui](https://docs.docker.com/get-docker/).
+- **Docker**: necessário para executar tanto o Postgres quanto o Pgadmin e o sonarqube localmente. Instruções de instalação estão disponíveis [aqui](https://docs.docker.com/get-docker/).
 
 - **Git**: essencial para clonar o repositório. Baixe-o [aqui](https://www.git-scm.com/downloads).
 
