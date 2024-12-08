@@ -11,6 +11,7 @@ Este projeto consiste em uma API desenvolvida como requisito para pontuação na
 - Adam Caldas Lopes - 01640350
 - José Carlos Moura Silva - 01530501
 - Thiago Oliveira Lima Pessoa - 01089643
+- Guilherme de Luna - 01615925
 
 
 ## Pré-requisitos
